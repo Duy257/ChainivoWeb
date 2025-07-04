@@ -8,7 +8,7 @@ const { Text } = Typography;
 
 export default function Counter() {
   const dispatch = useDispatch();
-  const count = useSelector((state: RootState) => state.counterSlice.value);
+  const { value } = useSelector((state: RootState) => state.counter);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
@@ -17,7 +17,7 @@ export default function Counter() {
         <Button type="primary" onClick={() => dispatch(decrement(1))}>
           Decrement
         </Button>
-        <Text className="text-3xl font-semibold">{count}</Text>
+        <Text className="text-3xl font-semibold">{value}</Text>
         <Button type="primary" onClick={() => dispatch(increment(1))}>
           Increment
         </Button>

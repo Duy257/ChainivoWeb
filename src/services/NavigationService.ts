@@ -1,5 +1,7 @@
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
+type NavigateOptions = Parameters<AppRouterInstance["push"]>[1];
+
 class NavigationService {
   private router: AppRouterInstance | null = null;
 
@@ -7,7 +9,7 @@ class NavigationService {
     this.router = router;
   }
 
-  public navigate(path: string, options?: any): void {
+  public navigate(path: string, options?: NavigateOptions): void {
     if (this.router) {
       this.router.push(path, options);
     } else {
@@ -20,7 +22,7 @@ class NavigationService {
     }
   }
 
-  public replace(path: string, options?: any): void {
+  public replace(path: string, options?: NavigateOptions): void {
     if (this.router) {
       this.router.replace(path, options);
     } else {

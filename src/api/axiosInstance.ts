@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import ConfigAPI from "@/config/ConfigAPI";
 import {
   getDataToLocalStorage,
@@ -6,6 +6,10 @@ import {
   saveDataToLocalStorage,
 } from "@/utils/LocalStorage";
 import navigationService from "@/services/NavigationService";
+
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const axiosInstance = axios.create({
   baseURL: ConfigAPI.url,
@@ -17,7 +21,10 @@ let failedQueue: {
   reject: (reason?: any) => void;
 }[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (
+  error: AxiosError | null,
+  token: string | null = null
+) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -45,8 +52,15 @@ axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as
+      | CustomAxiosRequestConfig
+      | undefined;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
@@ -89,7 +103,7 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest);
         }
       } catch (e) {
-        processQueue(e, null);
+        processQueue(e as AxiosError, null);
         removeDataToLocalStorage("accessToken");
         removeDataToLocalStorage("refreshToken");
         removeDataToLocalStorage("timeRefresh");

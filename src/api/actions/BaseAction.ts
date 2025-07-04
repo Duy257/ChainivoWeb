@@ -1,5 +1,7 @@
 import { DataController } from "../BaseController";
 
+type DataObject = Record<string, unknown>;
+
 class BaseAction {
   private controller: DataController;
 
@@ -14,6 +16,7 @@ class BaseAction {
         return response.data;
       }
     } catch (error) {
+      console.error("Error in getAll:", error);
       return [];
     }
   }
@@ -34,6 +37,7 @@ class BaseAction {
         };
       }
     } catch (error) {
+      console.error("Error in fetch:", error);
       return {
         data: [],
         totalCount: 0,
@@ -48,28 +52,31 @@ class BaseAction {
         return response.data;
       }
     } catch (error) {
+      console.error("Error in fetchOne:", error);
       return null;
     }
   }
 
-  async create(data: any) {
+  async create(data: Array<DataObject>) {
     try {
       const response = await this.controller.add(data);
       if (response.code === 200) {
         return response.data;
       }
     } catch (error) {
+      console.error("Error in create:", error);
       return null;
     }
   }
 
-  async update(data: Array<{ [p: string]: any }>) {
+  async update(data: Array<DataObject>) {
     try {
       const response = await this.controller.edit(data);
       if (response.code === 200) {
         return response.data;
       }
     } catch (error) {
+      console.error("Error in update:", error);
       return null;
     }
   }
@@ -81,6 +88,7 @@ class BaseAction {
         return response.data;
       }
     } catch (error) {
+      console.error("Error in delete:", error);
       return null;
     }
   }

@@ -1,23 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  CustomerStatus,
-  MissionType,
-  StorageContanst,
-  TransactionStatus,
-  TransactionType,
-} from "@/config/Contanst";
-import { AchievedRank } from "@/types/RankTypes";
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {AchievedRank} from '@/types/RankTypes';
 
 interface CustomerState {
-  data?: any;
-  myAddress?: Array<any>;
+  data?: {Id: string; Rank: number} & Record<string, unknown>;
+  myAddress?: Array<
+    {Id: string; IsDefault?: boolean} & Record<string, unknown>
+  >;
   onLoading: boolean;
   type?: string;
   rankInfo?: {
     totalReward: number;
     totalScore: number;
     achievedRank: AchievedRank | null;
-    RanksData: Array<any> | null;
+    RanksData: Array<unknown> | null;
   } | null;
   rankInfoLoading: boolean;
 }
@@ -31,58 +26,71 @@ const initialState: CustomerState = {
 };
 
 export const customerSlice = createSlice({
-  name: "customer",
+  name: 'customer',
   initialState,
   reducers: {
-    handleActions: (state, action: PayloadAction<any>) => {
+    handleActions: (
+      state,
+      action: PayloadAction<{
+        type: string;
+        data?: unknown;
+        rankInfo?: unknown;
+      }>,
+    ) => {
       switch (action.payload.type) {
-        case "GETINFOR":
-          state.data = action.payload.data;
-          state.rankInfo = action.payload.rankInfo;
+        case 'GETINFOR':
+          state.data = action.payload.data as CustomerState['data'];
+          state.rankInfo = action.payload.rankInfo as CustomerState['rankInfo'];
           break;
-        case "GETMYADDRESS":
-          state.myAddress = action.payload.data;
+        case 'GETMYADDRESS':
+          state.myAddress = action.payload.data as CustomerState['myAddress'];
           break;
-        case "ADDADDRESS":
-          if (
-            state.myAddress &&
-            state.myAddress.length > 0 &&
-            state.myAddress.find((el) => el.Id === action.payload.data.Id)
-          ) {
-            state.myAddress = state.myAddress.map((el) => {
-              if (el.Id === action.payload.data.Id) {
-                return action.payload.data;
+        case 'ADDADDRESS':
+          {
+            const newAddress = action.payload.data as {
+              Id: string;
+              IsDefault?: boolean;
+            };
+            if (
+              state.myAddress &&
+              state.myAddress.length > 0 &&
+              state.myAddress.find(el => el.Id === newAddress.Id)
+            ) {
+              state.myAddress = state.myAddress.map(el => {
+                if (el.Id === newAddress.Id) {
+                  return newAddress;
+                }
+                if (newAddress.IsDefault) {
+                  return {...el, IsDefault: false};
+                }
+                return el;
+              });
+            } else {
+              if (state.myAddress && state.myAddress.length === 0) {
+                newAddress.IsDefault = true;
               }
-              if (action.payload.data.IsDefault) {
-                return { ...el, IsDefault: false };
-              }
-              return el;
-            });
-          } else {
-            const newAddress = { ...action.payload.data };
-            if (state.myAddress && state.myAddress.length === 0) {
-              newAddress.IsDefault = true;
+              state.myAddress = [newAddress, ...(state.myAddress || [])];
             }
-            state.myAddress = [newAddress, ...(state.myAddress || [])];
           }
           break;
-        case "DELETEADDRESS":
+        case 'DELETEADDRESS':
           if (state.myAddress) {
+            const deletedAddressId = action.payload.data as string;
             const deletedAddress = state.myAddress.find(
-              (el) => el.Id === action.payload.data
+              el => el.Id === deletedAddressId,
             );
             state.myAddress = state.myAddress.filter(
-              (el) => el.Id !== action.payload.data
+              el => el.Id !== deletedAddressId,
             );
             if (deletedAddress?.IsDefault && state.myAddress.length > 0) {
               state.myAddress[0].IsDefault = true;
             }
           }
           break;
-        case "UPDATE":
-          state.data = action.payload.data;
+        case 'UPDATE':
+          state.data = action.payload.data as CustomerState['data'];
           break;
-        case "LOGOUT":
+        case 'LOGOUT':
           state.data = undefined;
           state.myAddress = [];
           state.rankInfo = null;
@@ -92,17 +100,17 @@ export const customerSlice = createSlice({
       }
       state.onLoading = false;
     },
-    onFetching: (state) => {
+    onFetching: state => {
       state.onLoading = true;
     },
-    setRankInfo: (state, action) => {
+    setRankInfo: (state, action: PayloadAction<CustomerState['rankInfo']>) => {
       state.rankInfo = action.payload;
       state.rankInfoLoading = false;
     },
-    setRankInfoLoading: (state) => {
+    setRankInfoLoading: state => {
       state.rankInfoLoading = true;
     },
-    resetRankInfo: (state) => {
+    resetRankInfo: state => {
       state.rankInfo = null;
       state.rankInfoLoading = false;
     },

@@ -1,8 +1,11 @@
 import axiosInstance from "./axiosInstance";
 import ConfigAPI from "@/config/ConfigAPI";
 
+type HeaderOptions = Record<string, string>;
+type BodyOptions = Record<string, unknown>;
+
 export class BaseDA {
-  static createUrlPayment = async (body?: any) => {
+  static createUrlPayment = async (body?: BodyOptions) => {
     const response = await axiosInstance.post(
       "https://redis.ktxgroup.com.vn/api/vnpay/create_payment_url",
       body
@@ -14,7 +17,7 @@ export class BaseDA {
 
   static post = async (
     url: string,
-    options?: { headers?: { [k: string]: any }; body?: any }
+    options?: { headers?: HeaderOptions; body?: BodyOptions }
   ) => {
     try {
       const relativeUrl = url.replace(ConfigAPI.url, "");
@@ -40,7 +43,7 @@ export class BaseDA {
 
   static postFile = async (
     url: string,
-    options?: { headers?: { [k: string]: any }; body?: FormData }
+    options?: { headers?: HeaderOptions; body?: FormData }
   ) => {
     try {
       const relativeUrl = url.replace(ConfigAPI.url, "");
@@ -61,10 +64,7 @@ export class BaseDA {
     }
   };
 
-  static get = async (
-    url: string,
-    options?: { headers?: { [k: string]: any } }
-  ) => {
+  static get = async (url: string, options?: { headers?: HeaderOptions }) => {
     try {
       const relativeUrl = url.replace(ConfigAPI.url, "");
       const response = await axiosInstance.get(relativeUrl, {
@@ -86,12 +86,12 @@ export class BaseDA {
   };
 
   static uploadFiles = async (
-    listFile: Array<{ uri: string; type: string; name: string }>
+    listFile: Array<{ uri: Blob; type: string; name: string }>
   ) => {
     try {
       const formData = new FormData();
       listFile.forEach((file) => {
-        formData.append("files", file.uri as any, file.name);
+        formData.append("files", file.uri, file.name);
       });
 
       const response = await this.postFile(ConfigAPI.url + "file/uploadfiles", {

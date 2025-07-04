@@ -8,8 +8,14 @@ import AuthLayout from "@/components/layouts/AuthLayout";
 
 const { Title } = Typography;
 
+interface RegisterValues {
+  email: string;
+  password?: string;
+  confirm?: string;
+}
+
 const RegisterPage = () => {
-  const onFinish = (values: any) => {
+  const onFinish = (values: RegisterValues) => {
     console.log("Received values of form: ", values);
   };
 

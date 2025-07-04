@@ -1,5 +1,5 @@
-import ConfigAPI from "@/config/ConfigAPI";
-import { BaseDA } from "@/api/BaseDA";
+import ConfigAPI from '@/config/ConfigAPI';
+import {BaseDA} from '@/api/BaseDA';
 
 export class DataController {
   private pid: string;
@@ -10,7 +10,7 @@ export class DataController {
   }
 
   async getAll() {
-    const res = await BaseDA.get(ConfigAPI.url + "data/getAll", {
+    const res = await BaseDA.get(ConfigAPI.url + 'data/getAll', {
       headers: {
         module: this.module,
         pid: this.pid ?? ConfigAPI.pid,
@@ -26,11 +26,11 @@ export class DataController {
           size?: number;
           searchRaw?: string;
           filter?: string;
-          sortby?: Array<{ prop: string; direction?: "ASC" | "DESC" }>;
+          sortby?: Array<{prop: string; direction?: 'ASC' | 'DESC'}>;
         }
-      | undefined
+      | undefined,
   ) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/aggregateList", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/aggregateList', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
@@ -48,11 +48,11 @@ export class DataController {
           searchRaw?: string;
           key: string;
           notEmpty?: boolean;
-          sortby?: Array<{ prop: string; direction?: "ASC" | "DESC" }>;
+          sortby?: Array<{prop: string; direction?: 'ASC' | 'DESC'}>;
         }
-      | undefined
+      | undefined,
   ) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/filterByEmptyKey", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/filterByEmptyKey', {
       headers: {
         pid: ConfigAPI.pid,
         module: this.module,
@@ -62,8 +62,8 @@ export class DataController {
     return res;
   }
 
-  async group(options: { searchRaw?: string; reducers: string }) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/group", {
+  async group(options: {searchRaw?: string; reducers: string}) {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/group', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
@@ -76,7 +76,7 @@ export class DataController {
   async groupByIds(params: {
     reducers: Array<{
       Name: string;
-      Reducer: any;
+      Reducer: string;
       ReducerBy?: string;
       TbName: string;
       Column: string;
@@ -95,30 +95,30 @@ export class DataController {
           groupNames.push(e.TbName);
         }
       }
-      for (let _tbName of groupNames) {
-        const _tmp = params.reducers.filter((e) => e.TbName === _tbName);
+      for (const _tbName of groupNames) {
+        const _tmp = params.reducers.filter(e => e.TbName === _tbName);
         const _reduceQuery = _tmp
           .map(
-            (e) =>
+            e =>
               `REDUCE ${e.Reducer} ${
                 e.ReducerBy ? `1 @${e.ReducerBy}` : 0
-              } AS ${e.Name}`
+              } AS ${e.Name}`,
           )
-          .join(" ");
+          .join(' ');
         const _colName = _tmp[0].Column;
         const _groupName = `_${_colName}`;
         groupReducers.push({
           tbName: _tbName,
           searchRaw: params.ids.length
-            ? `@${_colName}:{${params.ids.map((_id) => `${_id}*`).join(" | ")}}`
-            : "*",
+            ? `@${_colName}:{${params.ids.map(_id => `${_id}*`).join(' | ')}}`
+            : '*',
           query:
             `APPLY @${_colName} AS ${_groupName}` +
             ` GROUPBY 1 @${_groupName} ${_reduceQuery}`,
         });
       }
-      const res = await BaseDA.post(ConfigAPI.url + "data/groupByIds", {
-        headers: { pid: this.pid ?? ConfigAPI.pid },
+      const res = await BaseDA.post(ConfigAPI.url + 'data/groupByIds', {
+        headers: {pid: this.pid ?? ConfigAPI.pid},
         body: {
           reducers: groupReducers,
         },
@@ -135,18 +135,18 @@ export class DataController {
           size?: number;
           query?: string;
           returns?: Array<string>;
-          sortby?: { BY: string; DIRECTION?: "ASC" | "DESC"; ORDER?: string };
+          sortby?: {BY: string; DIRECTION?: 'ASC' | 'DESC'; ORDER?: string};
         }
-      | undefined
+      | undefined,
   ) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/getListSimple", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/getListSimple', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
       },
       body: {
         ...options,
-        searchRaw: options?.query?.length ? options?.query : "*",
+        searchRaw: options?.query?.length ? options?.query : '*',
       },
     });
     return res;
@@ -158,20 +158,20 @@ export class DataController {
           page?: number;
           size?: number;
           query?: string;
-          pattern?: any; // {}
+          pattern?: any;
           returns?: Array<string>;
-          sortby?: { BY: string; DIRECTION?: "ASC" | "DESC"; ORDER?: string };
+          sortby?: {BY: string; DIRECTION?: 'ASC' | 'DESC'; ORDER?: string};
         }
-      | undefined
+      | undefined,
   ) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/patternList", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/patternList', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
       },
       body: {
         ...options,
-        searchRaw: options?.query?.length ? options?.query : "*",
+        searchRaw: options?.query?.length ? options?.query : '*',
         pattern: options?.pattern,
       },
     });
@@ -189,45 +189,45 @@ export class DataController {
   }
 
   async getByListId(ids: Array<string>) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/getByIds", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/getByIds', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
       },
-      body: { ids: ids },
+      body: {ids: ids},
     });
     return res;
   }
 
-  async add(data: Array<{ [p: string]: any }>) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/action?action=add", {
+  async add(data: Array<any>) {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/action?action=add', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
       },
-      body: { data: data },
+      body: {data: data},
     });
     return res;
   }
 
-  async edit(data: Array<{ [p: string]: any }>) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/action?action=edit", {
+  async edit(data: Array<any>) {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/action?action=edit', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
       },
-      body: { data: data },
+      body: {data: data},
     });
     return res;
   }
 
   async delete(ids: Array<string>) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/action?action=delete", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/action?action=delete', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
       },
-      body: { ids: ids },
+      body: {ids: ids},
     });
     return res;
   }
@@ -235,14 +235,14 @@ export class DataController {
   async groupBy(params: {
     reducers: Array<{
       Name: string;
-      Reducer: any;
+      Reducer: string;
       ReducerBy?: string;
       GroupBy: string;
       Query?: string;
     }>;
     searchRaw?: string;
   }) {
-    const res = await BaseDA.post(ConfigAPI.url + "data/groupBy", {
+    const res = await BaseDA.post(ConfigAPI.url + 'data/groupBy', {
       headers: {
         pid: this.pid ?? ConfigAPI.pid,
         module: this.module,
@@ -265,28 +265,29 @@ export class IntergrationController {
     imageUrl?: string;
     type?: string;
   }) {
-    await BaseDA.post(ConfigAPI.url + "intergration/sendMessageAll", {
-      headers: { pid: this.pid },
+    await BaseDA.post(ConfigAPI.url + 'intergration/sendMessageAll', {
+      headers: {pid: this.pid},
       body: options,
     });
   }
 
   async sendMessageToGroup(options: {
-    customers: any;
+    customers: Array<string>;
     searchRaw?: string;
     title?: string;
     body?: string;
     imageUrl?: string;
     type?: string;
   }) {
-    await BaseDA.post(ConfigAPI.url + "intergration/sendMessageToGroup", {
-      headers: { pid: this.pid, module: "Customer" },
+    await BaseDA.post(ConfigAPI.url + 'intergration/sendMessageToGroup', {
+      headers: {pid: this.pid, module: 'Customer'},
       body: options,
     });
   }
 
   async sendMessageToDevice(options: {
     customerId?: string;
+    deviceTokens?: Array<string>;
     title?: string;
     body?: string;
     imageUrl?: string;
@@ -303,11 +304,11 @@ export class IntergrationController {
       CustomerId: options.customerId,
       // ConfigNotificationId: configNotificationId,
     };
-    const controller = new DataController("Notification");
+    const controller = new DataController('Notification');
     var addnoti = await controller.add([notiItem]);
     if (addnoti.code === 200) {
-      await BaseDA.post(ConfigAPI.url + "intergration/sendMessageToDevice", {
-        headers: { pid: this.pid, module: "Customer" },
+      await BaseDA.post(ConfigAPI.url + 'intergration/sendMessageToDevice', {
+        headers: {pid: this.pid, module: 'Customer'},
         body: options,
       });
     }
@@ -316,31 +317,31 @@ export class IntergrationController {
 
 export class SettingDataController {
   private pid: string;
-  private setting: "model" | "reducer" | "chart" | "form" | "card";
+  private setting: 'model' | 'reducer' | 'chart' | 'form' | 'card';
   private type: string;
-  constructor(setting: "model" | "reducer" | "chart" | "form" | "card") {
+  constructor(setting: 'model' | 'reducer' | 'chart' | 'form' | 'card') {
     this.pid = ConfigAPI.pid;
     this.setting = setting;
-    if (setting === "model" || setting === "reducer") {
-      this.type = "report";
+    if (setting === 'model' || setting === 'reducer') {
+      this.type = 'report';
     } else {
       this.type = setting;
     }
   }
 
   async action(
-    action: "add" | "edit" | "delete",
-    options: { data?: Array<{ [p: string]: any }>; ids?: Array<string> }
+    action: 'add' | 'edit' | 'delete',
+    options: {data?: Array<any>; ids?: Array<string>},
   ) {
     const res = await BaseDA.post(
       ConfigAPI.url +
         `data/${
-          this.type === "report" ? `${this.type}/${this.setting}` : this.type
+          this.type === 'report' ? `${this.type}/${this.setting}` : this.type
         }/action?action=${action}`,
       {
-        headers: { pid: this.pid },
-        body: { data: options.data, ids: options.ids },
-      }
+        headers: {pid: this.pid},
+        body: {data: options.data, ids: options.ids},
+      },
     );
     return res;
   }
@@ -352,25 +353,25 @@ export class SettingDataController {
           size?: number;
           query?: string;
           returns?: Array<string>;
-          sortby?: { BY: string; DIRECTION?: "ASC" | "DESC" };
+          sortby?: {BY: string; DIRECTION?: 'ASC' | 'DESC'};
         }
-      | undefined
+      | undefined,
   ) {
     const res = await BaseDA.post(
       ConfigAPI.url +
         `data/${
-          this.type === "report" ? `${this.type}/${this.setting}` : this.type
+          this.type === 'report' ? `${this.type}/${this.setting}` : this.type
         }/getListSimple`,
       {
-        headers: { pid: this.pid },
+        headers: {pid: this.pid},
         body: {
-          searchRaw: options?.query?.length ? options?.query : "*",
+          searchRaw: options?.query?.length ? options?.query : '*',
           page: options?.page ?? 1,
           size: options?.size ?? 10,
           returns: options?.returns,
           sortby: options?.sortby,
         },
-      }
+      },
     );
     return res;
   }
@@ -379,12 +380,12 @@ export class SettingDataController {
     const res = await BaseDA.post(
       ConfigAPI.url +
         `data/${
-          this.type === "report" ? `${this.type}/${this.setting}` : this.type
+          this.type === 'report' ? `${this.type}/${this.setting}` : this.type
         }/getByIds`,
       {
-        headers: { pid: this.pid },
-        body: { ids: ids },
-      }
+        headers: {pid: this.pid},
+        body: {ids: ids},
+      },
     );
     return res;
   }
@@ -393,35 +394,35 @@ export class SettingDataController {
 export class TableController {
   private pid: string;
   private module:
-    | "table"
-    | "column"
-    | "rel"
-    | "menu"
-    | "page"
-    | "layer"
-    | "designtoken"
-    | "workflow"
-    | "stage"
-    | "settingstage";
+    | 'table'
+    | 'column'
+    | 'rel'
+    | 'menu'
+    | 'page'
+    | 'layer'
+    | 'designtoken'
+    | 'workflow'
+    | 'stage'
+    | 'settingstage';
   constructor(
     module:
-      | "table"
-      | "column"
-      | "rel"
-      | "menu"
-      | "page"
-      | "layer"
-      | "designtoken"
-      | "workflow"
-      | "stage"
-      | "settingstage"
+      | 'table'
+      | 'column'
+      | 'rel'
+      | 'menu'
+      | 'page'
+      | 'layer'
+      | 'designtoken'
+      | 'workflow'
+      | 'stage'
+      | 'settingstage',
   ) {
     this.pid = ConfigAPI.pid;
     this.module = module;
   }
 
   async getAll() {
-    const res = await BaseDA.get(ConfigAPI.url + "setting/getAll", {
+    const res = await BaseDA.get(ConfigAPI.url + 'setting/getAll', {
       headers: {
         pid: this.pid,
         module: this.module,
@@ -431,12 +432,12 @@ export class TableController {
   }
 
   async getByListId(ids: Array<string>) {
-    const res = await BaseDA.post(ConfigAPI.url + "setting/getByIds", {
+    const res = await BaseDA.post(ConfigAPI.url + 'setting/getByIds', {
       headers: {
         pid: this.pid,
         module: this.module,
       },
-      body: { ids: ids },
+      body: {ids: ids},
     });
     return res;
   }
@@ -446,15 +447,15 @@ export class TableController {
     size?: number;
     query?: string;
     returns?: Array<string>;
-    sortby?: { BY: string; DIRECTION?: "ASC" | "DESC" };
+    sortby?: {BY: string; DIRECTION?: 'ASC' | 'DESC'};
   }) {
-    const res = await BaseDA.post(ConfigAPI.url + "setting/getListSimple", {
+    const res = await BaseDA.post(ConfigAPI.url + 'setting/getListSimple', {
       headers: {
         pid: this.pid,
         module: this.module,
       },
       body: {
-        searchRaw: options?.query ?? "*",
+        searchRaw: options?.query ?? '*',
         page: options?.page ?? 1,
         size: options?.size ?? 10,
         returns: options?.returns,
@@ -464,8 +465,8 @@ export class TableController {
     return res;
   }
 
-  async group(options: { searchRaw?: string; reducers: string }) {
-    const res = await BaseDA.post(ConfigAPI.url + "setting/group", {
+  async group(options: {searchRaw?: string; reducers: string}) {
+    const res = await BaseDA.post(ConfigAPI.url + 'setting/group', {
       headers: {
         pid: this.pid,
         module: this.module,
@@ -477,14 +478,14 @@ export class TableController {
 
   async delete(ids: Array<string>) {
     const res = await BaseDA.post(
-      ConfigAPI.url + "setting/action?action=delete",
+      ConfigAPI.url + 'setting/action?action=delete',
       {
         headers: {
           pid: this.pid,
           module: this.module,
         },
-        body: { ids: ids },
-      }
+        body: {ids: ids},
+      },
     );
     return res;
   }
