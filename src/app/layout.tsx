@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AntdRegistry from "../lib/AntdRegistry";
 import StoreProvider from "./StoreProvider";
+import NavigationInjector from "@/components/utility/NavigationInjector";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,6 +20,7 @@ export default function RootLayout({
     <StoreProvider>
       <html lang="en">
         <body>
+          <NavigationInjector />
           <AntdRegistry>{children}</AntdRegistry>
         </body>
       </html>

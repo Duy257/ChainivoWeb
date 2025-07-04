@@ -13,7 +13,7 @@ export function useNavigation() {
   const searchParams = useSearchParams();
 
   // Navigate to a new page
-  const navigate = (path: string, replace: boolean = false) => {
+  const navigateTo = (path: string, replace: boolean = false) => {
     if (replace) {
       router.replace(path);
     } else {
@@ -67,7 +67,7 @@ export function useNavigation() {
   };
 
   return {
-    navigate,
+    navigateTo,
     goBack,
     refresh,
     getCurrentPath,
