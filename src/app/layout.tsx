@@ -7,6 +7,7 @@ import AntdRegistry from '@/lib/AntdRegistry';
 import StoreProvider from '@/app/StoreProvider';
 import NavigationInjector from '@/components/utility/NavigationInjector';
 import {AuthProvider} from '@/components/utility/AuthProvider';
+import Header from '@/components/layouts/Header';
 
 const inter = Inter({subsets: ['latin']});
 
@@ -27,7 +28,8 @@ export default function RootLayout({
           <StoreProvider>
             <AuthProvider>
               <NavigationInjector />
-              {children}
+              <Header />
+              <main className="pt-[110px]">{children}</main>
             </AuthProvider>
           </StoreProvider>
         </AntdRegistry>
