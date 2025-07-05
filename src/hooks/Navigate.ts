@@ -1,7 +1,7 @@
 // Navigation Controller for Next.js (Complete Solution)
-"use client";
+'use client';
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import {useRouter, usePathname} from 'next/navigation';
 
 /**
  * Simple Navigation Hook for Next.js
@@ -10,14 +10,23 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 export function useNavigation() {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   // Navigate to a new page
-  const navigateTo = (path: string, replace: boolean = false) => {
+  const navigateTo = (
+    path: string,
+    replace: boolean = false,
+    params?: Record<string, string>,
+  ) => {
+    let fullPath = path;
+    if (params) {
+      const queryString = new URLSearchParams(params).toString();
+      fullPath = queryString ? `${path}?${queryString}` : path;
+    }
+
     if (replace) {
-      router.replace(path);
+      router.replace(fullPath);
     } else {
-      router.push(path);
+      router.push(fullPath);
     }
   };
 
@@ -36,25 +45,11 @@ export function useNavigation() {
     return pathname;
   };
 
-  // Get all query parameters as object
-  const getQueryParams = () => {
-    const params: Record<string, string> = {};
-    searchParams.forEach((value, key) => {
-      params[key] = value;
-    });
-    return params;
-  };
-
-  // Get specific query parameter
-  const getQueryParam = (key: string) => {
-    return searchParams.get(key);
-  };
-
   // Navigate with query parameters
   const navigateWithQuery = (
     path: string,
     query: Record<string, string>,
-    replace: boolean = false
+    replace: boolean = false,
   ) => {
     const queryString = new URLSearchParams(query).toString();
     const fullPath = queryString ? `${path}?${queryString}` : path;
@@ -71,8 +66,6 @@ export function useNavigation() {
     goBack,
     refresh,
     getCurrentPath,
-    getQueryParams,
-    getQueryParam,
     navigateWithQuery,
   };
 }
