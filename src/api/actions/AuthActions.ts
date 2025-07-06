@@ -33,6 +33,8 @@ class AuthAction {
       console.error('Logout error:', error);
     }
   };
+
+  static refreshToken = async () => {};
 }
 
 export default AuthAction;

@@ -9,7 +9,7 @@ import {ColorThemes} from '@/config/Color';
 import {useNavigation} from '@/hooks/Navigate';
 import {saveDataToLocalStorage} from '@/utils/LocalStorage';
 import {useQuickNotification} from '@/plugins/NotificationPlugin/NotificationPlugin';
-import AuthAction from '@/api/actions/AuthAction';
+import AuthAction from '@/api/actions/AuthActions';
 
 const {Title} = Typography;
 const colors = ColorThemes.light;
