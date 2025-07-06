@@ -8,7 +8,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
-import type {UploadFile, UploadProps} from 'antd';
+import type {UploadProps} from 'antd';
 import {BaseDA} from '@/api/BaseDA';
 
 const {Dragger} = Upload;
@@ -24,7 +24,7 @@ interface FileInfo {
   progress?: number;
 }
 
-function App() {
+function UploadDemo() {
   const [fileList, setFileList] = useState<FileInfo[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -361,4 +361,4 @@ function App() {
   );
 }
 
-export default App;
+export default UploadDemo;
