@@ -6,4 +6,4 @@ class ProductAction extends BaseAction {
   }
 }
 
-export default ProductAction;
+export default new ProductAction();

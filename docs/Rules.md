@@ -5,6 +5,7 @@
 ### 1.1 Components
 
 - Tên component luôn viết camelCase. ví dụ: Home, ProductDetail...
+- Tất cả các type để ở thư mục types
 
 ## 1.2 Quy Tắc Đặt Tên Folder
 
@@ -37,20 +38,20 @@
 ### 5. Cấu trúc router
 
 ├── app/
-│   ├── (routes)/
-│   │   ├── about/
-│   │       ├── page.tsx
-│   │       ├── components - các file module tách ra sẽ để ở đây
-│   │       ├── hooks  - custom hooks để ở đây
-│   │       ├── ultis - các function tách ra để ở đây
-│   ├── layout.tsx
-│   └── page.tsx
+│ ├── (routes)/
+│ │ ├── about/
+│ │ ├── page.tsx
+│ │ ├── components - các file module tách ra sẽ để ở đây
+│ │ ├── hooks - custom hooks để ở đây
+│ │ ├── ultis - các function tách ra để ở đây
+│ ├── layout.tsx
+│ └── page.tsx
 ├── components/
-│   ├── ui/
-│   │   ├── Button.tsx
-│   │   └── Card.tsx
-│   ├── layout/
-│       ├── Header.tsx
-│       └── Footer.tsx
+│ ├── ui/
+│ │ ├── Button.tsx
+│ │ └── Card.tsx
+│ ├── layout/
+│ ├── Header.tsx
+│ └── Footer.tsx
 
 **Lưu ý**: Tất cả các quy tắc này nhằm đảm bảo code dễ đọc, dễ bảo trì và nhất quán trong toàn bộ dự án.
