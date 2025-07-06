@@ -1,6 +1,6 @@
 import {BaseDA} from '@/api/BaseDA';
 import ConfigAPI from '@/config/ConfigAPI';
-import { saveDataToLocalStorage } from '@/utils/LocalStorage';
+import {useNavigation} from '@/hooks/Navigate';
 
 class AuthAction {
   static login = async (body: {
@@ -16,15 +16,22 @@ class AuthAction {
       headers: {module: 'Customer', pid: ConfigAPI.pid},
       body: body,
     });
-    if (res.code === 200) {
-      saveDataToLocalStorage('accessToken', `${res.data.accessToken}`);
-      saveDataToLocalStorage('refreshToken', `${res.data.refreshToken}`);
-      saveDataToLocalStorage(
-        'timeRefresh',
-        `${(Date.now() / 1000 + 9 * 60).toString()}`,
-      );
-    }
+
     return res;
+  };
+
+  static logout = async () => {
+    try {
+      // Clear local storage tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('timeRefresh');
+
+      // Redirect to login page
+      useNavigation().navigateTo('/login', true);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 }
 

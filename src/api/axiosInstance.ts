@@ -1,11 +1,11 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
-import ConfigAPI from "@/config/ConfigAPI";
+import axios, {AxiosError, InternalAxiosRequestConfig} from 'axios';
+import ConfigAPI from '@/config/ConfigAPI';
 import {
   getDataToLocalStorage,
   removeDataToLocalStorage,
   saveDataToLocalStorage,
-} from "@/utils/LocalStorage";
-import navigationService from "@/services/NavigationService";
+} from '@/utils/LocalStorage';
+import navigationService from '@/services/NavigationService';
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -23,9 +23,9 @@ let failedQueue: {
 
 const processQueue = (
   error: AxiosError | null,
-  token: string | null = null
+  token: string | null = null,
 ) => {
-  failedQueue.forEach((prom) => {
+  failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error);
     } else {
@@ -36,20 +36,21 @@ const processQueue = (
 };
 
 axiosInstance.interceptors.request.use(
-  async (config) => {
-    const accessToken = getDataToLocalStorage("accessToken");
+  async config => {
+    const accessToken = getDataToLocalStorage('accessToken');
+    console.log('🚀 ~ accessToken:', accessToken);
     if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
-  }
+  },
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => {
+  response => {
     return response;
   },
   async (error: AxiosError) => {
@@ -64,13 +65,13 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
-          failedQueue.push({ resolve, reject });
+          failedQueue.push({resolve, reject});
         })
-          .then((token) => {
-            originalRequest.headers["Authorization"] = "Bearer " + token;
+          .then(token => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
             return axios(originalRequest);
           })
-          .catch((err) => {
+          .catch(err => {
             return Promise.reject(err);
           });
       }
@@ -78,36 +79,36 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = getDataToLocalStorage("refreshToken");
+      const refreshToken = getDataToLocalStorage('refreshToken');
       if (!refreshToken) {
-        navigationService.replace("/login");
+        navigationService.replace('/login');
         return Promise.reject(error);
       }
 
       try {
-        const res = await axios.post(ConfigAPI.url + "data/refreshToken", {
+        const res = await axios.post(ConfigAPI.url + 'data/refreshToken', {
           refreshToken,
         });
 
         if (res.data.code === 200) {
           const newAccessToken = res.data.accessToken;
-          saveDataToLocalStorage("accessToken", newAccessToken);
+          saveDataToLocalStorage('accessToken', newAccessToken);
           saveDataToLocalStorage(
-            "timeRefresh",
-            `${Date.now() / 1000 + 9 * 60}`
+            'timeRefresh',
+            `${Date.now() / 1000 + 9 * 60}`,
           );
-          axiosInstance.defaults.headers.common["Authorization"] =
-            "Bearer " + newAccessToken;
-          originalRequest.headers["Authorization"] = "Bearer " + newAccessToken;
+          axiosInstance.defaults.headers.common['Authorization'] =
+            'Bearer ' + newAccessToken;
+          originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
           processQueue(null, newAccessToken);
           return axiosInstance(originalRequest);
         }
       } catch (e) {
         processQueue(e as AxiosError, null);
-        removeDataToLocalStorage("accessToken");
-        removeDataToLocalStorage("refreshToken");
-        removeDataToLocalStorage("timeRefresh");
-        navigationService.replace("/login");
+        removeDataToLocalStorage('accessToken');
+        removeDataToLocalStorage('refreshToken');
+        removeDataToLocalStorage('timeRefresh');
+        navigationService.replace('/login');
         return Promise.reject(e);
       } finally {
         isRefreshing = false;
@@ -115,7 +116,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

@@ -1,6 +1,6 @@
 'use client';
 
-import {useConfirm} from '@/components/utility/ConfirmPlugin';
+import {useConfirm} from '@/plugins/ConfirmPlugin';
 import {Button} from 'antd';
 
 function MyComponent() {

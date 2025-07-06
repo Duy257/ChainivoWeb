@@ -7,7 +7,9 @@ import Link from 'next/link';
 import AuthLayout from '@/components/layouts/AuthLayout';
 import {ColorThemes} from '@/config/Color';
 import {useNavigation} from '@/hooks/Navigate';
-import AuthAction from '@/api/actions/authAction';
+import {saveDataToLocalStorage} from '@/utils/LocalStorage';
+import {useQuickNotification} from '@/plugins/NotificationPlugin/NotificationPlugin';
+import AuthAction from '@/api/actions/AuthAction';
 
 const {Title} = Typography;
 const colors = ColorThemes.light;
@@ -18,7 +20,8 @@ interface LoginValues {
 }
 
 const LoginPage = () => {
-  const router = useNavigation();
+  const quickNotificationHook = useQuickNotification();
+  const navigateHook = useNavigation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,26 +30,33 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const result = await AuthAction.login({
+      const res = await AuthAction.login({
         type: 'phone',
         phone: values.phone,
         password: values.password,
       });
 
-      if (result?.error) {
-        // Handle different types of errors
-        if (result.error === 'CredentialsSignin') {
-          setError('Số điện thoại hoặc mật khẩu không đúng.');
-        } else {
-          setError(
-            'Đã có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại.',
+      switch (res.code) {
+        case 200:
+          saveDataToLocalStorage('accessToken', `${res.data.accessToken}`);
+          saveDataToLocalStorage('refreshToken', `${res.data.refreshToken}`);
+          saveDataToLocalStorage(
+            'timeRefresh',
+            `${(Date.now() / 1000 + 9 * 60).toString()}`,
           );
-        }
-      } else if (result?.ok) {
-        // Login successful, redirect to home page
-        router.navigateTo('/', true);
-      } else {
-        setError('Đăng nhập không thành công. Vui lòng thử lại.');
+          quickNotificationHook.success('Đăng nhập thành công!');
+          navigateHook.navigateTo('/', true);
+          return res;
+        case 401:
+          return quickNotificationHook.error(
+            'Số điện thoại chưa được đăng ký.',
+          );
+        case 403:
+          return quickNotificationHook.error(
+            'Mật khẩu không đúng, vui lòng kiểm tra lại.',
+          );
+        default:
+          throw new Error('Server error');
       }
     } catch (error) {
       console.error('Login error:', error);

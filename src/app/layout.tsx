@@ -6,8 +6,8 @@ import './globals.css';
 import AntdRegistry from '@/lib/AntdRegistry';
 import StoreProvider from '@/app/StoreProvider';
 import NavigationInjector from '@/components/utility/NavigationInjector';
-import {AuthProvider} from '@/components/utility/AuthProvider';
-import {ConfirmProvider} from '@/components/utility/ConfirmPlugin';
+import {ConfirmProvider} from '@/plugins/ConfirmPlugin';
+import {NotificationProvider} from '@/plugins/NotificationPlugin';
 import Header from '@/components/layouts/Header';
 
 const inter = Inter({subsets: ['latin']});
@@ -27,13 +27,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <AntdRegistry>
           <StoreProvider>
-            <ConfirmProvider>
-              <AuthProvider>
+            <NotificationProvider>
+              <ConfirmProvider>
                 <NavigationInjector />
                 <Header />
                 <main className="pt-[110px]">{children}</main>
-              </AuthProvider>
-            </ConfirmProvider>
+              </ConfirmProvider>
+            </NotificationProvider>
           </StoreProvider>
         </AntdRegistry>
       </body>
