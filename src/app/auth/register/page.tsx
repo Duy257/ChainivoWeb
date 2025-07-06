@@ -83,7 +83,7 @@ const RegisterPage = () => {
             Register
           </Button>
         </Form.Item>
-        Already have an account? <Link href="/login">Log in</Link>
+        Already have an account? <Link href="/auth/login">Log in</Link>
       </Form>
     </AuthLayout>
   );

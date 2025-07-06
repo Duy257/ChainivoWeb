@@ -84,11 +84,11 @@ const UserInfo = () => (
 
 const AuthButtons = () => (
   <div className="flex items-center space-x-4">
-    <Link href="/register" className="font-semibold hover:text-gray-200">
+    <Link href="/auth/register" className="font-semibold hover:text-gray-200">
       Đăng Ký
     </Link>
     <div className="border-l h-4 border-gray-400" />
-    <Link href="/login" className="font-semibold hover:text-gray-200">
+    <Link href="/auth/login" className="font-semibold hover:text-gray-200">
       Đăng Nhập
     </Link>
   </div>

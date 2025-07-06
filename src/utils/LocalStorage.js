@@ -1,22 +1,3 @@
-export const saveObjToLocalStorage = (key, value) => {
-  try {
-    const jsonValue = JSON.stringify(value);
-    localStorage.setItem(key, jsonValue);
-  } catch (e) {
-    console.error('Lỗi khi lưu data:', e);
-  }
-};
-
-export const getObjToLocalStorage = key => {
-  try {
-    const jsonValue = localStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.error('Lỗi khi lấy data:', e);
-    return null;
-  }
-};
-
 export const saveDataToLocalStorage = (key, value) => {
   try {
     localStorage.setItem(key, value);
