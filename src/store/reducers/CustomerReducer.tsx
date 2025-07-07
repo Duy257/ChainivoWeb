@@ -1,5 +1,7 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {AchievedRank} from '@/types/RankTypes';
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from '../store';
 
 interface CustomerState {
   data?: {Id: string; Rank: number} & Record<string, unknown>;
@@ -38,8 +40,10 @@ export const customerSlice = createSlice({
       }>,
     ) => {
       switch (action.payload.type) {
-        case 'GETINFOR':
+        case 'SETINFOR':
           state.data = action.payload.data as CustomerState['data'];
+          break;
+        case 'SETRANKINFO':
           state.rankInfo = action.payload.rankInfo as CustomerState['rankInfo'];
           break;
         case 'GETMYADDRESS':
@@ -100,6 +104,16 @@ export const customerSlice = createSlice({
       }
       state.onLoading = false;
     },
+    setData: (
+      state,
+      action: PayloadAction<{
+        stateName: keyof CustomerState;
+        data: any;
+      }>,
+    ) => {
+      const {stateName, data} = action.payload;
+      (state as any)[stateName] = data;
+    },
     onFetching: state => {
       state.onLoading = true;
     },
@@ -123,6 +137,27 @@ export const {
   setRankInfo,
   setRankInfoLoading,
   resetRankInfo,
+  setData,
 } = customerSlice.actions;
 
 export default customerSlice.reducer;
+
+export const useCustomerHook = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const actions = {
+    setData: ({
+      stateName,
+      data,
+    }: {
+      stateName: keyof CustomerState;
+      data: any;
+    }) => {
+      dispatch(setData({stateName, data}));
+    },
+  };
+
+  return {
+    ...actions,
+  };
+};

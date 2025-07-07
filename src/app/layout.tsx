@@ -25,8 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AntdRegistry>
-          <StoreProvider>
+        <StoreProvider>
+          <AntdRegistry>
             <NotificationProvider>
               <ConfirmProvider>
                 <NavigationInjector />
@@ -34,8 +34,8 @@ export default function RootLayout({
                 <main className="pt-[110px]">{children}</main>
               </ConfirmProvider>
             </NotificationProvider>
-          </StoreProvider>
-        </AntdRegistry>
+          </AntdRegistry>
+        </StoreProvider>
       </body>
     </html>
   );

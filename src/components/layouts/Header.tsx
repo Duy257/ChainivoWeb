@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Input, Badge, Avatar} from 'antd';
 import {
   SearchOutlined,
@@ -12,6 +12,11 @@ import {
 } from '@ant-design/icons';
 import Link from 'next/link';
 import Image from 'next/image';
+import {RootState} from '@/store/store';
+import {useSelector} from 'react-redux';
+import {StorageContanst} from '@/config/Contanst';
+import {getDataToLocalStorage} from '@/utils/LocalStorage';
+import {CustomerAction} from '@/api/actions/CustomerAction';
 
 const navLinks = [
   {
@@ -44,6 +49,24 @@ const navLinks = [
   },
 ];
 
+// Helper function to get rank name based on rank number
+const getRankName = (rank: number) => {
+  switch (rank) {
+    case 1:
+      return 'VIP';
+    case 2:
+      return 'Member';
+    default:
+      return 'Member';
+  }
+};
+
+// Helper function to mask phone number
+const maskPhone = (phone: string) => {
+  if (!phone || phone.length < 6) return 'N/A';
+  return `${phone.slice(0, 2)}***${phone.slice(-3)}`;
+};
+
 const Logo = () => (
   <div className="flex-shrink-0">
     <Link href="/">
@@ -68,19 +91,28 @@ const SearchBar = () => (
   </div>
 );
 
-const UserInfo = () => (
-  <div className="flex items-center space-x-2">
-    <Avatar src="https://i.pravatar.cc/150?u=a042581f4e29026704d" />
-    <div className="hidden xl:block">
-      <div>Nguyễn Đức Long</div>
-      <div className="text-xs">
-        <span>Ruby</span>
-        <span> • </span>
-        <span>09***135</span>
+const UserInfo = ({customerData}: {customerData: any}) => {
+  return (
+    <div className="flex items-center space-x-2">
+      <Avatar
+        src={
+          customerData?.Avatar ||
+          `https://i.pravatar.cc/150?u=${customerData?.Id || 'default'}`
+        }
+      />
+      <div className="hidden xl:block">
+        <div>{customerData?.Name || 'Người dùng'}</div>
+        <div className="text-xs">
+          <span>{getRankName(customerData?.Rank || 2)}</span>
+          <span> • </span>
+          <span>
+            {maskPhone(customerData?.Mobile || customerData?.Phone || '')}
+          </span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const AuthButtons = () => (
   <div className="flex items-center space-x-4">
@@ -94,7 +126,13 @@ const AuthButtons = () => (
   </div>
 );
 
-const DesktopNav = ({isLoggedIn}: {isLoggedIn: boolean}) => (
+const DesktopNav = ({
+  isLoggedIn,
+  customerData,
+}: {
+  isLoggedIn: boolean;
+  customerData: any;
+}) => (
   <div className="hidden md:flex flex-shrink-0 items-center space-x-4">
     {navLinks.map(link => (
       <Link
@@ -112,15 +150,23 @@ const DesktopNav = ({isLoggedIn}: {isLoggedIn: boolean}) => (
       </Link>
     ))}
     <div className="pl-4 border-l h-8 border-gray-500" />
-    {isLoggedIn ? <UserInfo /> : <AuthButtons />}
+    {isLoggedIn ? (
+      <Link href="/profile">
+        <UserInfo customerData={customerData} />
+      </Link>
+    ) : (
+      <AuthButtons />
+    )}
   </div>
 );
 
 const MobileNav = ({
   isLoggedIn,
+  customerData,
   onClose,
 }: {
   isLoggedIn: boolean;
+  customerData: any;
   onClose: () => void;
 }) => (
   <div className="absolute top-0 left-0 w-full h-screen bg-[#1C33FF] z-50 p-4 md:hidden">
@@ -144,14 +190,40 @@ const MobileNav = ({
         </Link>
       ))}
       <hr className="border-gray-500" />
-      <div className="pt-4">{isLoggedIn ? <UserInfo /> : <AuthButtons />}</div>
+      <div className="pt-4">
+        {isLoggedIn ? (
+          <UserInfo customerData={customerData} />
+        ) : (
+          <AuthButtons />
+        )}
+      </div>
     </div>
   </div>
 );
 
 const Header = () => {
-  const isLoggedIn = false;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Get customer data from Redux store
+  const {data} = useSelector((state: RootState) => state.customer);
+
+  // Derive login status from Redux state
+  const isLoggedIn = Boolean(data && data.Id);
+
+  const handleGetInforCustomer = async () => {
+    const res = await CustomerAction.getInfor();
+    if (res.code === 200) {
+      console.log('Customer info fetched:', res.data);
+    }
+  };
+
+  useEffect(() => {
+    const custumerId = getDataToLocalStorage(StorageContanst.CustomerId);
+    if (custumerId && !data) {
+      handleGetInforCustomer();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <header className="bg-[#1C33FF] text-white fixed top-0 left-0 z-50 w-full">
@@ -160,7 +232,7 @@ const Header = () => {
         <div className="hidden md:flex flex-grow mx-4">
           <SearchBar />
         </div>
-        <DesktopNav isLoggedIn={isLoggedIn} />
+        <DesktopNav isLoggedIn={isLoggedIn} customerData={data} />
         <div className="md:hidden">
           <button onClick={() => setIsMenuOpen(true)}>
             <MenuOutlined style={{fontSize: '24px'}} />
@@ -170,6 +242,7 @@ const Header = () => {
       {isMenuOpen && (
         <MobileNav
           isLoggedIn={isLoggedIn}
+          customerData={data}
           onClose={() => setIsMenuOpen(false)}
         />
       )}

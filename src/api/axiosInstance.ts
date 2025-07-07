@@ -38,7 +38,6 @@ const processQueue = (
 axiosInstance.interceptors.request.use(
   async config => {
     const accessToken = getDataToLocalStorage('accessToken');
-    console.log('🚀 ~ accessToken:', accessToken);
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }

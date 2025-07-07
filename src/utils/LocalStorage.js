@@ -7,10 +7,8 @@ export const saveDataToLocalStorage = (key, value) => {
 };
 
 export const getDataToLocalStorage = key => {
-  console.log("🚀 ~ key:", key)
   try {
     const data = localStorage.getItem(key);
-    console.log("🚀 ~ data:", data)
     return data;
   } catch (e) {
     console.error('Lỗi khi lấy data:', e);

@@ -10,6 +10,7 @@ import {useNavigation} from '@/hooks/Navigate';
 import {saveDataToLocalStorage} from '@/utils/LocalStorage';
 import {useQuickNotification} from '@/plugins/NotificationPlugin/NotificationPlugin';
 import AuthAction from '@/api/actions/AuthActions';
+import {CustomerAction} from '@/api/actions/CustomerAction';
 
 const {Title} = Typography;
 const colors = ColorThemes.light;
@@ -31,7 +32,7 @@ const LoginPage = () => {
 
     try {
       const res = await AuthAction.login({
-        type: 'phone',
+        type: 'account',
         phone: values.phone,
         password: values.password,
       });
@@ -44,19 +45,19 @@ const LoginPage = () => {
             'timeRefresh',
             `${(Date.now() / 1000 + 9 * 60).toString()}`,
           );
+          await CustomerAction.getInfor();
           quickNotificationHook.success('Đăng nhập thành công!');
           navigateHook.navigateTo('/', true);
           return res;
         case 401:
-          return quickNotificationHook.error(
-            'Số điện thoại chưa được đăng ký.',
-          );
+          return setError('Số điện thoại chưa được đăng ký.');
+
         case 403:
-          return quickNotificationHook.error(
-            'Mật khẩu không đúng, vui lòng kiểm tra lại.',
+          return setError(
+            'Tài khoản hoặc mật khẩu không đúng, vui lòng kiểm tra lại.',
           );
         default:
-          throw new Error('Server error');
+          return setError('Đã có lỗi xảy ra. Vui lòng thử lại');
       }
     } catch (error) {
       console.error('Login error:', error);

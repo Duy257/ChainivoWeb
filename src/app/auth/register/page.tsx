@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Button, Form, Input, Typography } from "antd";
-import { MailOutlined, LockOutlined } from "@ant-design/icons";
-import Link from "next/link";
-import AuthLayout from "@/components/layouts/AuthLayout";
+import React from 'react';
+import {Button, Form, Input, Typography} from 'antd';
+import {MailOutlined, LockOutlined} from '@ant-design/icons';
+import Link from 'next/link';
+import AuthLayout from '@/components/layouts/AuthLayout';
 
-const { Title } = Typography;
+const {Title} = Typography;
 
 interface RegisterValues {
   email: string;
@@ -15,13 +15,11 @@ interface RegisterValues {
 }
 
 const RegisterPage = () => {
-  const onFinish = (values: RegisterValues) => {
-    console.log("Received values of form: ", values);
-  };
+  const onFinish = (values: RegisterValues) => {};
 
   return (
     <AuthLayout>
-      <div style={{ textAlign: "center", marginBottom: "40px" }}>
+      <div style={{textAlign: 'center', marginBottom: '40px'}}>
         <Title level={2}>Register</Title>
       </div>
       <Form name="normal_register" onFinish={onFinish} scrollToFirstError>
@@ -29,15 +27,14 @@ const RegisterPage = () => {
           name="email"
           rules={[
             {
-              type: "email",
-              message: "The input is not valid E-mail!",
+              type: 'email',
+              message: 'The input is not valid E-mail!',
             },
             {
               required: true,
-              message: "Please input your E-mail!",
+              message: 'Please input your E-mail!',
             },
-          ]}
-        >
+          ]}>
           <Input prefix={<MailOutlined />} placeholder="Email" />
         </Form.Item>
         <Form.Item
@@ -45,41 +42,39 @@ const RegisterPage = () => {
           rules={[
             {
               required: true,
-              message: "Please input your password!",
+              message: 'Please input your password!',
             },
           ]}
-          hasFeedback
-        >
+          hasFeedback>
           <Input.Password prefix={<LockOutlined />} placeholder="Password" />
         </Form.Item>
         <Form.Item
           name="confirm"
-          dependencies={["password"]}
+          dependencies={['password']}
           hasFeedback
           rules={[
             {
               required: true,
-              message: "Please confirm your password!",
+              message: 'Please confirm your password!',
             },
-            ({ getFieldValue }) => ({
+            ({getFieldValue}) => ({
               validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
+                if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
                 return Promise.reject(
-                  new Error("The two passwords that you entered do not match!")
+                  new Error('The two passwords that you entered do not match!'),
                 );
               },
             }),
-          ]}
-        >
+          ]}>
           <Input.Password
             prefix={<LockOutlined />}
             placeholder="Confirm Password"
           />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+          <Button type="primary" htmlType="submit" style={{width: '100%'}}>
             Register
           </Button>
         </Form.Item>
